@@ -52,34 +52,47 @@ if current_url!='https://www.facebook.com/login.php?login_attempt=1&lwv=110' :
     home = current_url
 
     wishing_page=browser.get(url)
-    count=len(browser.find_elements_by_name("message"))
-
+    count = 0
+    #count=len(browser.find_elements_by_name("message"))
+    #Points to the first section of birthdays division in "birthdays" page and it will be Today's birthday
+    go_div=browser.find_elements_by_xpath('//*[@id="birthdays_content"]/div[1]/div[2]/ul/li')
+    count=len(go_div)
     #list = []
     #i=0
-    if count!=0 :
-
-        while(count>0):
-
-            wish=wishes[randint(0,len(wishes)-1)]
-
-            wishing=browser.find_element_by_name("message")
-            wishing.click()
-
-            wishing.send_keys(wish)
-            wishing.send_keys(Keys.RETURN)
-
-            #div = browser.find_element_by_class_name('_tzn')
-            #list.append(div.find_element_by_css_selector('a').text)
-            #print list[i]
-            #i+=1
-
-            count=count-1
-            sleep(20)
-            wishing_page=browser.get(url)
-        return_home=browser.get(home)
-            
-        print 'Wished every bday buddies. Relax and chill !!'
-    else :
+    try :
+        go_today_bday=browser.find_element_by_xpath('//*[@id="birthdays_today_card"]/span[1]')
+        if(go_today_bday.text != "Today's Birthdays") :
+            count = 0
+        if count!=0 :
+            print('These friends of yours have their birthdays today')
+            i=0
+            while(i<count) :
+                name=go_div[i].find_element_by_tag_name('a')
+                print(name.text)
+                i=i+1    
+            sleep(1)
+            reply=raw_input('Do you want to wish them all ? "yes"?\n')
+            if(reply=='yes') :
+                i=0
+                while(i<count) :
+                    wish=""
+                    wish=wishes[randint(0,len(wishes)-1)]
+                    wishing=go_div[i].find_element_by_name("message")
+                    wishing.click()
+                    wishing.send_keys(wish)
+                    wishing.send_keys(Keys.RETURN)
+                    i = i+1
+                    sleep(5)
+                    wishing_page=browser.get(url)
+                    sleep(2)
+                    go_div=browser.find_elements_by_xpath('//*[@id="birthdays_content"]/div[1]/div[2]/ul/li')
+                return_home=browser.get(current_url)
+                print 'Wished every bday buddies. Relax and chill !!'
+            else :
+                print 'Ok Done! Thy will be done, Wish them on your own. Always here for your service! <3'
+        else :
+            print 'There are no birthdays today I feel jobless :(' 
+    except :
         print 'There are no birthdays today I feel jobless :('
 else :
     print 'You are high af. Run program again with correct credentials'
